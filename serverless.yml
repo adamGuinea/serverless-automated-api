@@ -26,7 +26,6 @@ custom:
   # Fallback to default if it is not in prod.
   environment: ${file(env.yml):${self:custom.stage}, file(env.yml):default}
 
-
 provider:
   name: aws
   runtime: nodejs8.10
@@ -40,7 +39,6 @@ provider:
   environment:
     tableName: ${self:custom.tableName}
     stripeSecretKey: ${self:custom.environment.stripeSecretKey}
-
 
   iamRoleStatements:
     - Effect: Allow
@@ -121,6 +119,15 @@ functions:
           cors: true
           authorizer: aws_iam
 
+  billing:
+    handler: billing.main
+    events:
+      - http:
+          path: billing
+          method: post
+          cors: true
+          authorizer: aws_iam
+
 # Create resources with separate CloudFormation templates
 resources:
   # API Gateway Errors
@@ -132,12 +139,3 @@ resources:
   # Cognito
   - ${file(resources/cognito-user-pool.yml)}
   - ${file(resources/cognito-identity-pool.yml)}
-  billing:
-    handler: billing.main
-    events:
-      - http:
-          path: billing
-          method: post
-          cors: true
-          authorizer: aws_iam
-
